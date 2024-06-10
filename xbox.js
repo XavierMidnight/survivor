@@ -7,15 +7,21 @@ const enemyImage = 'enemies.webp'; // Update with the correct path if needed
 const enemySize = { width: 64, height: 64 }; // Size of each enemy in the sprite sheet
 const numColumns = 8; // Number of columns in the sprite sheet
 const numRows = 4; // Number of rows in the sprite sheet
-let bulletSpeed = 2500;
+let bulletSpeed = 1000;
 const bulletSpeedUI = document.getElementById('bullet-speed');
 let healthPoints = 100;
 const healthBar = document.getElementById('health-bar');
 const gameOverScreen = document.getElementById('game-over');
 let isInvulnerable = false;
+let enemiesKilled = 0; // Track the number of enemies killed
+const enemyKillCountUI = document.getElementById('enemy-kill-count');
 
 function updateBulletSpeedUI() {
     bulletSpeedUI.innerText = `Bullet Speed: ${bulletSpeed}ms`;
+}
+
+function updateEnemyKillCountUI() {
+    enemyKillCountUI.innerText = `Enemies Killed: ${enemiesKilled}`;
 }
 
 function decreaseHealth(amount) {
@@ -62,9 +68,11 @@ function restartGame() {
 
     // Reset health and bullet speed
     healthPoints = 100;
-    bulletSpeed = 2500;
+    bulletSpeed = 1000;
     healthBar.style.width = `${healthPoints}%`;
+    enemiesKilled = 0;
     updateBulletSpeedUI();
+    updateEnemyKillCountUI();
 
     // Reset player position
     position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -217,13 +225,7 @@ function shootBullet() {
     document.body.appendChild(bullet);
     bullets.push({ element: bullet, target: nearestEnemy });
 
-    // Adjust bullet speed and update UI
-    if (bulletSpeed > 10) {
-        bulletSpeed -= 100;
-        clearInterval(bulletInterval);
-        bulletInterval = setInterval(shootBullet, bulletSpeed);
-        updateBulletSpeedUI();
-    }
+
 }
 
 
@@ -256,8 +258,9 @@ function createExplosion(x, y) {
     }, 500);
 }
 
-// Modify the moveBullets function to include the explosion effect
 function moveBullets() {
+    let enemyKilled = false;
+
     bullets.forEach((bulletObj, index) => {
         let bullet = bulletObj.element;
         let target = bulletObj.target;
@@ -283,22 +286,29 @@ function moveBullets() {
             enemies.splice(enemies.indexOf(target), 1);
             bullets.splice(index, 1);
 
-            // Adjust bullet speed and update UI
-            if (bulletSpeed > 50) {
-                bulletSpeed -= 10;
-                clearInterval(bulletInterval);
-                bulletInterval = setInterval(shootBullet, bulletSpeed);
-                updateBulletSpeedUI();
-            }
+            // Mark that an enemy was killed
+            enemyKilled = true;
+            enemiesKilled += 1; // Increment the enemy kill count
         }
     });
+
+    // Update bullet speed and update UI only when an enemy is killed
+    if (enemyKilled) {
+        console.log("die:"+enemiesKilled);
+        bulletSpeed -= 10;
+        clearInterval(bulletInterval);
+        bulletInterval = setInterval(shootBullet, bulletSpeed);
+        updateBulletSpeedUI();
+        updateEnemyKillCountUI(); // Update the enemy kill count UI
+    }
 }
 
 
 enemyInterval = setInterval(spawnEnemy, 1000);
-bulletInterval = setInterval(shootBullet, 500);
+bulletInterval = setInterval(shootBullet, bulletSpeed);
 setInterval(moveBullets, 50);
 setInterval(moveEnemies, 50);
 setInterval(autoMovePlayer, 100);
 
 updatePosition();
+

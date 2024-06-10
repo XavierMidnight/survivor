@@ -33,7 +33,7 @@
                 opacity: 0;
             }
         }
-        #bullet-speed, #health-bar-container {
+        #bullet-speed, #health-bar-container, #enemy-kill-count {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -58,8 +58,11 @@
             background: red;
             border-radius: 5px;
         }
+        #enemy-kill-count {
+            top: 70px;
+        }
         #game-over {
-            display: none;
+            display: none; /* Initially hidden */
             position: fixed;
             top: 50%;
             left: 50%;
@@ -80,10 +83,11 @@
 </head>
 <body>
 <div id="cube"></div>
-<div id="bullet-speed">Bullet Speed: 500ms</div>
+<div id="bullet-speed">Bullet Speed: 1500ms</div>
 <div id="health-bar-container">
     <div id="health-bar"></div>
 </div>
+<div id="enemy-kill-count">Enemies Killed: 0</div>
 <div id="game-over">
     <h1>You have died</h1>
     <button onclick="restartGame()">Restart</button>
