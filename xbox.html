@@ -5,14 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vampire Survivors-like Game</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: white; }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('background.webp') no-repeat center center fixed;
+            background-size: cover;
+            filter: grayscale(100%);
+            z-index: -1; /* Ensure it is behind all other elements */
+        }
         #cube {
-            width: 50px; height: 50px;
-            background: red url('player.png') no-repeat center center;
-            background-size: cover; /* Ensure the image covers the entire cube */
+            width: 50px;
+            height: 50px;
+            background: red url('playerAnimation.webp') no-repeat center center;
+
+            background-size: 5px 5px; /* Ensure the image covers the entire cube */
             position: absolute;
             transition: transform 0.5s ease; /* Smooth transition for movement */
         }
+
         .enemy { width: 30px; height: 30px; background-color: green; position: absolute; }
         .bullet { width: 10px; height: 10px; background-color: blue; position: absolute; }
         .explosion {
@@ -83,7 +103,7 @@
 </head>
 <body>
 <div id="cube"></div>
-<div id="bullet-speed">Bullet Speed: 1500ms</div>
+<div id="bullet-speed">Bullet Speed: 500ms</div>
 <div id="health-bar-container">
     <div id="health-bar"></div>
 </div>

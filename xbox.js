@@ -4,10 +4,10 @@ let bullets = [];
 let position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 let enemyInterval, bulletInterval, autoMoveInterval, lastMoveTime = Date.now();
 const enemyImage = 'enemies.webp'; // Update with the correct path if needed
-const enemySize = { width: 64, height: 64 }; // Size of each enemy in the sprite sheet
-const numColumns = 8; // Number of columns in the sprite sheet
-const numRows = 4; // Number of rows in the sprite sheet
-let bulletSpeed = 1000;
+const enemySize = { width: 64, height: 64 }; // Adjust the size if the new sprite sheet has different dimensions
+const numColumns = 5; // Adjust the number of columns based on the new sprite sheet
+const numRows = 5; // Adjust the number of rows based on the new sprite sheet
+let bulletSpeed = 500;
 const bulletSpeedUI = document.getElementById('bullet-speed');
 let healthPoints = 100;
 const healthBar = document.getElementById('health-bar');
@@ -15,6 +15,27 @@ const gameOverScreen = document.getElementById('game-over');
 let isInvulnerable = false;
 let enemiesKilled = 0; // Track the number of enemies killed
 const enemyKillCountUI = document.getElementById('enemy-kill-count');
+
+const playerAnimation = document.getElementById('cube');
+const playerNumColumns = 6; // Adjust the number of columns based on the sprite sheet
+const playerNumRows = 3; // Adjust the number of rows based on the sprite sheet
+const frameWidth = 45; // Adjust the width of each frame
+const frameHeight = 64; // Adjust the height of each frame
+let frame = 0; // Change this to display a different portion of the image
+
+function updatePlayerAnimation() {
+    frame++;
+    if (frame>playerNumRows*playerNumColumns) {
+        frame=1;
+    }
+
+    const posX = (frame % playerNumColumns) * frameWidth;
+    const posY = Math.floor(frame / playerNumColumns) * frameHeight;
+
+    playerAnimation.style.backgroundPosition = `-${posX}px -${posY}px`;
+    playerAnimation.style.backgroundSize = `${playerNumColumns * frameWidth}px ${playerNumRows * frameHeight}px`;
+}
+
 
 function updateBulletSpeedUI() {
     bulletSpeedUI.innerText = `Bullet Speed: ${bulletSpeed}ms`;
@@ -115,7 +136,7 @@ function updateGamepadStatus() {
 }
 
 function autoMovePlayer() {
-    if (Date.now() - lastMoveTime > 5000) {
+    if (Date.now() - lastMoveTime > 1000) {
         let nearestEnemies = findNearestEnemies(3); // Get the 3 nearest enemies
         if (nearestEnemies.length > 0) {
             let totalAngleX = 0;
@@ -141,6 +162,8 @@ function autoMovePlayer() {
             position.y = Math.max(0, Math.min(window.innerHeight - 50, position.y));
 
             cube.style.transform = `translate(${position.x}px, ${position.y}px)`;
+
+            updatePlayerAnimation();
         }
     }
 }
