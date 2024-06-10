@@ -57,7 +57,7 @@ function decreaseHealth(amount) {
     } else {
         // Make player invulnerable and apply red filter
         isInvulnerable = true;
-        cube.style.filter = 'hue-rotate(-90deg) saturate(3)';
+        cube.style.filter = 'hue-rotate(90deg) saturate(3)';
 
         // Revert filter and invulnerability after 1 second
         setTimeout(() => {
