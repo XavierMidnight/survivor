@@ -20,13 +20,13 @@ const playerAnimation = document.getElementById('cube');
 const playerNumColumns = 6; // Adjust the number of columns based on the sprite sheet
 const playerNumRows = 3; // Adjust the number of rows based on the sprite sheet
 const frameWidth = 45; // Adjust the width of each frame
-const frameHeight = 64; // Adjust the height of each frame
+const frameHeight = 55; // Adjust the height of each frame
 let frame = 0; // Change this to display a different portion of the image
 
 function updatePlayerAnimation() {
     frame++;
-    if (frame>playerNumRows*playerNumColumns) {
-        frame=1;
+    if (frame ===playerNumRows*playerNumColumns) {
+        frame=0;
     }
 
     const posX = (frame % playerNumColumns) * frameWidth;
@@ -318,7 +318,9 @@ function moveBullets() {
     // Update bullet speed and update UI only when an enemy is killed
     if (enemyKilled) {
         console.log("die:"+enemiesKilled);
-        bulletSpeed -= 10;
+        if(bulletSpeed>=20) {
+            bulletSpeed -= 10;
+        }
         clearInterval(bulletInterval);
         bulletInterval = setInterval(shootBullet, bulletSpeed);
         updateBulletSpeedUI();
