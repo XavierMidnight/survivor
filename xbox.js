@@ -13,6 +13,7 @@ let healthPoints = 100;
 const healthBar = document.getElementById('health-bar');
 const gameOverScreen = document.getElementById('game-over');
 let isInvulnerable = false;
+const countdownElement = document.getElementById('countdown');
 let enemiesKilled = 0; // Track the number of enemies killed
 const enemyKillCountUI = document.getElementById('enemy-kill-count');
 
@@ -67,6 +68,22 @@ function decreaseHealth(amount) {
     }
 }
 
+function startCountdown(seconds) {
+    let remainingTime = seconds;
+    countdownElement.innerText = `Restarting in ${remainingTime}...`;
+    countdownElement.style.display = 'block';
+
+    const countdownInterval = setInterval(() => {
+        remainingTime -= 1;
+        countdownElement.innerText = `Restarting in ${remainingTime}...`;
+
+        if (remainingTime <= 0) {
+            clearInterval(countdownInterval);
+            countdownElement.style.display = 'none';
+            restartGame();
+        }
+    }, 1000);
+}
 
 function endGame() {
     clearInterval(enemyInterval);
@@ -81,6 +98,8 @@ function endGame() {
 
     // Show game over screen
     gameOverScreen.style.display = 'block';
+    // Start countdown for auto-restart
+    startCountdown(5); // 5 seconds countdown
 }
 
 function restartGame() {
@@ -203,12 +222,12 @@ function spawnEnemy() {
     let side = Math.floor(Math.random() * 4);
     if (side === 0) {
         enemy.style.left = Math.random() * window.innerWidth + 'px';
-        enemy.style.top = '-30px';
+        enemy.style.top = '-200px';
     } else if (side === 1) {
         enemy.style.left = Math.random() * window.innerWidth + 'px';
         enemy.style.top = window.innerHeight + 'px';
     } else if (side === 2) {
-        enemy.style.left = '-30px';
+        enemy.style.left = '-200px';
         enemy.style.top = Math.random() * window.innerHeight + 'px';
     } else {
         enemy.style.left = window.innerWidth + 'px';
