@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vampire Survivors-like Game</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: white; }
+        #cube {
+            width: 50px; height: 50px;
+            background: red url('player.png') no-repeat center center;
+            background-size: cover; /* Ensure the image covers the entire cube */
+            position: absolute;
+            transition: transform 0.5s ease; /* Smooth transition for movement */
+        }
+        .enemy { width: 30px; height: 30px; background-color: green; position: absolute; }
+        .bullet { width: 10px; height: 10px; background-color: blue; position: absolute; }
+        .explosion {
+            width: 30px;
+            height: 30px;
+            background: url('explosion.png') no-repeat center center / cover;
+            position: absolute;
+            pointer-events: none;
+            animation: explode 0.5s ease-out forwards;
+        }
+        @keyframes explode {
+            from {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            to {
+                transform: scale(2.0);
+                opacity: 0;
+            }
+        }
+        #bullet-speed, #health-bar-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: black;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #health-bar-container {
+            top: 40px;
+            width: 200px;
+            height: 20px;
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #health-bar {
+            height: 100%;
+            width: 100%;
+            background: red;
+            border-radius: 5px;
+        }
+        #game-over {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        #game-over button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="cube"></div>
+<div id="bullet-speed">Bullet Speed: 500ms</div>
+<div id="health-bar-container">
+    <div id="health-bar"></div>
+</div>
+<div id="game-over">
+    <h1>You have died</h1>
+    <button onclick="restartGame()">Restart</button>
+</div>
+<script src="xbox.js"></script>
+</body>
+</html>
