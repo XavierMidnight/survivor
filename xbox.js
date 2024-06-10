@@ -16,6 +16,7 @@ let isInvulnerable = false;
 const countdownElement = document.getElementById('countdown');
 let enemiesKilled = 0; // Track the number of enemies killed
 const enemyKillCountUI = document.getElementById('enemy-kill-count');
+const minimap = document.getElementById('minimap');
 
 const playerAnimation = document.getElementById('cube');
 const playerNumColumns = 6; // Adjust the number of columns based on the sprite sheet
@@ -26,8 +27,8 @@ let frame = 0; // Change this to display a different portion of the image
 
 function updatePlayerAnimation() {
     frame++;
-    if (frame ===playerNumRows*playerNumColumns) {
-        frame=0;
+    if (frame === playerNumRows * playerNumColumns) {
+        frame = 0;
     }
 
     const posX = (frame % playerNumColumns) * frameWidth;
@@ -36,7 +37,6 @@ function updatePlayerAnimation() {
     playerAnimation.style.backgroundPosition = `-${posX}px -${posY}px`;
     playerAnimation.style.backgroundSize = `${playerNumColumns * frameWidth}px ${playerNumRows * frameHeight}px`;
 }
-
 
 function updateBulletSpeedUI() {
     bulletSpeedUI.innerText = `Bullet Speed: ${bulletSpeed}ms`;
@@ -126,6 +126,7 @@ function restartGame() {
 
 function updatePosition() {
     cube.style.transform = `translate(${position.x}px, ${position.y}px)`;
+
 }
 
 window.addEventListener("gamepadconnected", (event) => {
@@ -155,34 +156,6 @@ function updateGamepadStatus() {
 }
 
 
-function autoMovePlayer() {
-    if (Date.now() - lastMoveTime > 1000) {
-        let nearestEnemies = findNearestEnemies(10); // Get the nearest enemy
-        if (nearestEnemies.length > 0) {
-            let nearestEnemy = nearestEnemies[0];
-
-            // Calculate direction away from the nearest enemy
-            let ex = parseFloat(nearestEnemy.style.left);
-            let ey = parseFloat(nearestEnemy.style.top);
-            let angle = Math.atan2(position.y - ey, position.x - ex);
-
-            let moveX = Math.cos(angle) * 10; // Adjust speed as needed
-            let moveY = Math.sin(angle) * 10; // Adjust speed as needed
-
-            // Move the player away from the nearest enemy
-            position.x += moveX;
-            position.y += moveY;
-
-            // Ensure the player stays within the game bounds
-            position.x = Math.max(0, Math.min(window.innerWidth - 50, position.x));
-            position.y = Math.max(0, Math.min(window.innerHeight - 50, position.y));
-
-            cube.style.transform = `translate(${position.x}px, ${position.y}px)`;
-
-            updatePlayerAnimation();
-        }
-    }
-}
 
 function findNearestEnemies(count) {
     let distances = enemies.map(enemy => {
@@ -200,8 +173,6 @@ function findNearestEnemies(count) {
     // Return the closest enemies up to the specified count
     return distances.slice(0, count).map(item => item.enemy);
 }
-
-
 
 
 
@@ -243,6 +214,34 @@ function spawnEnemy() {
     enemies.push(enemy);
 }
 
+function autoMovePlayer() {
+    if (Date.now() - lastMoveTime > 1000) {
+        let nearestEnemies = findNearestEnemies(1); // Get the nearest enemy
+        if (nearestEnemies.length > 0) {
+            let nearestEnemy = nearestEnemies[0];
+
+            // Calculate direction away from the nearest enemy
+            let ex = parseFloat(nearestEnemy.style.left);
+            let ey = parseFloat(nearestEnemy.style.top);
+            let angle = Math.atan2(position.y - ey, position.x - ex);
+
+            let moveX = Math.cos(angle) * 10; // Adjust speed as needed
+            let moveY = Math.sin(angle) * 10; // Adjust speed as needed
+
+            // Move the player away from the nearest enemy
+            position.x += moveX;
+            position.y += moveY;
+
+            // Ensure the player stays within the game bounds
+            position.x = Math.max(0, Math.min(window.innerWidth - 50, position.x));
+            position.y = Math.max(0, Math.min(window.innerHeight - 50, position.y));
+
+            updatePosition();
+
+        }
+    }
+}
+
 function moveEnemies() {
     enemies.forEach(enemy => {
         let ex = parseFloat(enemy.style.left);
@@ -259,7 +258,48 @@ function moveEnemies() {
             }
         }
     });
+
 }
+
+function updateMinimap() {
+    // Clear previous minimap objects
+    minimap.innerHTML = '';
+
+    // Add player position to minimap
+    let playerMinimap = document.createElement('div');
+    playerMinimap.classList.add('minimap-object');
+    playerMinimap.style.width = '5px';
+    playerMinimap.style.height = '5px';
+    playerMinimap.style.backgroundColor = 'red';
+    playerMinimap.style.left = `${(position.x / window.innerWidth) * minimap.offsetWidth}px`;
+    playerMinimap.style.top = `${(position.y / window.innerHeight) * minimap.offsetHeight}px`;
+    minimap.appendChild(playerMinimap);
+
+    // Add enemies to minimap
+    enemies.forEach(enemy => {
+        let ex = parseFloat(enemy.style.left);
+        let ey = parseFloat(enemy.style.top);
+        let enemyMinimap = document.createElement('div');
+        enemyMinimap.classList.add('minimap-object', 'minimap-enemy');
+        enemyMinimap.style.width = '3px';
+        enemyMinimap.style.height = '3px';
+
+        // Calculate position on minimap
+        let miniX = (ex / window.innerWidth) * minimap.offsetWidth;
+        let miniY = (ey / window.innerHeight) * minimap.offsetHeight;
+
+        // Ensure enemies just outside the screen are shown on the minimap within a secondary border
+        if (ex < 0) miniX = 0; // Left of screen, adjust to the edge of minimap
+        if (ex > window.innerWidth) miniX = minimap.offsetWidth - 3; // Right of screen, adjust to the edge of minimap
+        if (ey < 0) miniY = 0; // Top of screen, adjust to the edge of minimap
+        if (ey > window.innerHeight) miniY = minimap.offsetHeight - 3; // Bottom of screen, adjust to the edge of minimap
+
+        enemyMinimap.style.left = `${miniX}px`;
+        enemyMinimap.style.top = `${miniY}px`;
+        minimap.appendChild(enemyMinimap);
+    });
+}
+
 
 function shootBullet() {
     if (enemies.length === 0) return;
@@ -272,10 +312,7 @@ function shootBullet() {
     bullet.style.top = position.y + 20 + 'px';
     document.body.appendChild(bullet);
     bullets.push({ element: bullet, target: nearestEnemy });
-
-
 }
-
 
 function findNearestEnemy() {
     let minDistance = Infinity;
@@ -342,8 +379,8 @@ function moveBullets() {
 
     // Update bullet speed and update UI only when an enemy is killed
     if (enemyKilled) {
-        console.log("die:"+enemiesKilled);
-        if(bulletSpeed>=100) {
+        console.log("die:" + enemiesKilled);
+        if (bulletSpeed >= 100) {
             bulletSpeed -= 10;
         }
         clearInterval(bulletInterval);
@@ -353,12 +390,12 @@ function moveBullets() {
     }
 }
 
-
 enemyInterval = setInterval(spawnEnemy, 1000);
 bulletInterval = setInterval(shootBullet, bulletSpeed);
-setInterval(moveBullets, bulletSpeed/bulletSpeed*10);
-setInterval(moveEnemies, 50);
-setInterval(autoMovePlayer, 100);
+setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
+setInterval(moveEnemies, 100);
+setInterval(autoMovePlayer, 50);
+setInterval(updateMinimap, 100);
+
 
 updatePosition();
-
