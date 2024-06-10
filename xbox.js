@@ -154,29 +154,26 @@ function updateGamepadStatus() {
     requestAnimationFrame(updateGamepadStatus);
 }
 
+
 function autoMovePlayer() {
     if (Date.now() - lastMoveTime > 1000) {
-        let nearestEnemies = findNearestEnemies(3); // Get the 3 nearest enemies
+        let nearestEnemies = findNearestEnemies(3); // Get the nearest enemy
         if (nearestEnemies.length > 0) {
-            let totalAngleX = 0;
-            let totalAngleY = 0;
+            let nearestEnemy = nearestEnemies[0];
 
-            nearestEnemies.forEach(enemy => {
-                let ex = parseFloat(enemy.style.left);
-                let ey = parseFloat(enemy.style.top);
-                let angle = Math.atan2(position.y - ey, position.x - ex);
+            // Calculate direction away from the nearest enemy
+            let ex = parseFloat(nearestEnemy.style.left);
+            let ey = parseFloat(nearestEnemy.style.top);
+            let angle = Math.atan2(position.y - ey, position.x - ex);
 
-                totalAngleX += Math.cos(angle);
-                totalAngleY += Math.sin(angle);
-            });
+            let moveX = Math.cos(angle) * 10; // Adjust speed as needed
+            let moveY = Math.sin(angle) * 10; // Adjust speed as needed
 
-            // Calculate average direction away from the 3 nearest enemies
-            let avgAngleX = totalAngleX / nearestEnemies.length;
-            let avgAngleY = totalAngleY / nearestEnemies.length;
+            // Move the player away from the nearest enemy
+            position.x += moveX;
+            position.y += moveY;
 
-            position.x += avgAngleX * 10; // Move faster
-            position.y += avgAngleY * 10; // Move faster
-
+            // Ensure the player stays within the game bounds
             position.x = Math.max(0, Math.min(window.innerWidth - 50, position.x));
             position.y = Math.max(0, Math.min(window.innerHeight - 50, position.y));
 
@@ -191,13 +188,22 @@ function findNearestEnemies(count) {
     let distances = enemies.map(enemy => {
         let ex = parseFloat(enemy.style.left);
         let ey = parseFloat(enemy.style.top);
+
+        // Calculate the distance from the player to the enemy
         let distance = Math.sqrt((position.x - ex) ** 2 + (position.y - ey) ** 2);
         return { enemy, distance };
     });
 
+    // Sort enemies by distance from the player
     distances.sort((a, b) => a.distance - b.distance);
+
+    // Return the closest enemies up to the specified count
     return distances.slice(0, count).map(item => item.enemy);
 }
+
+
+
+
 
 window.addEventListener('resize', () => {
     position.x = Math.min(position.x, window.innerWidth - 50);
