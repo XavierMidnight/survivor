@@ -7,7 +7,7 @@ const enemyImage = 'enemies.webp'; // Update with the correct path if needed
 const enemySize = { width: 64, height: 64 }; // Adjust the size if the new sprite sheet has different dimensions
 const numColumns = 5; // Adjust the number of columns based on the new sprite sheet
 const numRows = 5; // Adjust the number of rows based on the new sprite sheet
-let bulletSpeed = 500;
+let bulletSpeed = 1500;
 const bulletSpeedUI = document.getElementById('bullet-speed');
 let healthPoints = 100;
 const healthBar = document.getElementById('health-bar');
@@ -157,7 +157,7 @@ function updateGamepadStatus() {
 
 function autoMovePlayer() {
     if (Date.now() - lastMoveTime > 1000) {
-        let nearestEnemies = findNearestEnemies(3); // Get the nearest enemy
+        let nearestEnemies = findNearestEnemies(10); // Get the nearest enemy
         if (nearestEnemies.length > 0) {
             let nearestEnemy = nearestEnemies[0];
 
@@ -343,7 +343,7 @@ function moveBullets() {
     // Update bullet speed and update UI only when an enemy is killed
     if (enemyKilled) {
         console.log("die:"+enemiesKilled);
-        if(bulletSpeed>=20) {
+        if(bulletSpeed>=100) {
             bulletSpeed -= 10;
         }
         clearInterval(bulletInterval);
@@ -356,7 +356,7 @@ function moveBullets() {
 
 enemyInterval = setInterval(spawnEnemy, 1000);
 bulletInterval = setInterval(shootBullet, bulletSpeed);
-setInterval(moveBullets, 50);
+setInterval(moveBullets, bulletSpeed/bulletSpeed*10);
 setInterval(moveEnemies, 50);
 setInterval(autoMovePlayer, 100);
 
