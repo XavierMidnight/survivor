@@ -3,7 +3,7 @@ let enemies = [];
 let bullets = [];
 let position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 let enemyInterval, bulletInterval, autoMoveInterval, lastMoveTime, moveEnemiesInterval,moveBulletsInterval = Date.now();
-const enemyImage = 'enemies.webp'; // Update with the correct path if needed
+const enemyImage = '/images/enemies.webp'; // Update with the correct path if needed
 const enemySize = { width: 64, height: 64 }; // Adjust the size if the new sprite sheet has different dimensions
 const numColumns = 5; // Adjust the number of columns based on the new sprite sheet
 const numRows = 5; // Adjust the number of rows based on the new sprite sheet
@@ -325,8 +325,8 @@ function spawnEnemy() {
     let enemyY = position.y + radius * Math.sin(angle);
 
     // Ensure the enemy is within the game bounds
-    enemyX = Math.max(0, Math.min(window.innerWidth - enemySize.width, enemyX));
-    enemyY = Math.max(0, Math.min(window.innerHeight - enemySize.height, enemyY));
+    //enemyX = Math.max(0, Math.min(window.innerWidth - enemySize.width, enemyX));
+    //enemyY = Math.max(0, Math.min(window.innerHeight - enemySize.height, enemyY));
 
     enemy.style.left = `${enemyX}px`;
     enemy.style.top = `${enemyY}px`;

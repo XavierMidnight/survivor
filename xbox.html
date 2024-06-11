@@ -18,7 +18,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('background.webp') no-repeat center center fixed;
+            background: url('images/background.webp') no-repeat center center fixed;
             background-size: cover;
             filter: grayscale(100%);
             z-index: -1; /* Ensure it is behind all other elements */
@@ -26,7 +26,7 @@
         #cube {
             width: 45px;
             height: 55px;
-            background: white url('playerAnimation.webp') no-repeat center center;
+            background: white url('images/playerAnimation.webp') no-repeat center center;
             background-size: 5px 5px; /* Ensure the image covers the entire cube */
             position: absolute;
             transition: transform 0.5s ease; /* Smooth transition for movement */
@@ -36,7 +36,7 @@
         .explosion {
             width: 30px;
             height: 30px;
-            background: url('explosion.png') no-repeat center center / cover;
+            background: url('images/explosion.png') no-repeat center center / cover;
             position: absolute;
             pointer-events: none;
             animation: explode 0.5s ease-out forwards;
@@ -168,6 +168,8 @@
     </row>
 </div>
 
-<script src="xbox.js"></script>
+<script type="module" src="xbox.js"></script>
+
+
 </body>
 </html>
