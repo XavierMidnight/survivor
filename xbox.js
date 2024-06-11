@@ -17,13 +17,96 @@ const countdownElement = document.getElementById('countdown');
 let enemiesKilled = 0; // Track the number of enemies killed
 const enemyKillCountUI = document.getElementById('enemy-kill-count');
 const minimap = document.getElementById('minimap');
-
+let minimapScale = 1; // Add a scale for zooming
 const playerAnimation = document.getElementById('cube');
 const playerNumColumns = 6; // Adjust the number of columns based on the sprite sheet
 const playerNumRows = 3; // Adjust the number of rows based on the sprite sheet
 const frameWidth = 45; // Adjust the width of each frame
 const frameHeight = 55; // Adjust the height of each frame
 let frame = 0; // Change this to display a different portion of the image
+
+
+
+
+window.addEventListener('resize', () => {
+    updateMinimapSize();
+    updateMinimap();  // Ensure the minimap updates on window resize
+});
+
+updateMinimapSize(); // Initial call to set the minimap size
+
+document.getElementById('zoom-in').addEventListener('click', () => {
+    minimapScale = Math.min(minimapScale * 1.2, 5); // Increase scale, limit to a maximum value
+    updateMinimap();
+    updateMinimapSize()
+});
+
+document.getElementById('zoom-out').addEventListener('click', () => {
+    minimapScale = Math.max(minimapScale / 1.2, 0.5); // Decrease scale, limit to a minimum value
+    updateMinimap();
+    updateMinimapSize()
+});
+
+function updateMinimapSize() {
+    const windowAspect = window.innerWidth / window.innerHeight;
+    const minimapHeight = 150; // Fixed height
+    const minimapWidth = minimapHeight * windowAspect; // Adjust width based on aspect ratio
+    minimap.style.width = `${minimapWidth * minimapScale}px`;
+    minimap.style.height = `${minimapHeight * minimapScale}px`;
+    minimap.style.left += `${10}px`;
+    minimap.style.top += `${10}px`;
+
+}
+
+function updateMinimap() {
+    // Clear previous minimap objects
+    minimap.innerHTML = '';
+
+    const minimapWidth = minimap.offsetWidth;
+    const minimapHeight = minimap.offsetHeight;
+
+    // Apply scale transformation
+    minimap.style.transform = `scale(${minimapScale})`;
+
+
+    // Calculate scale factors
+    const scaleX = minimapWidth / window.innerWidth;
+    const scaleY = minimapHeight / window.innerHeight;
+
+    // Add player position to minimap
+    let playerMinimap = document.createElement('div');
+    playerMinimap.classList.add('minimap-object');
+    playerMinimap.style.width = '5px';
+    playerMinimap.style.height = '5px';
+    playerMinimap.style.backgroundColor = 'red';
+    playerMinimap.style.left = `${position.x * scaleX}px`;
+    playerMinimap.style.top = `${position.y * scaleY}px`;
+    minimap.appendChild(playerMinimap);
+
+    // Add enemies to minimap
+    enemies.forEach(enemy => {
+        let ex = parseFloat(enemy.style.left);
+        let ey = parseFloat(enemy.style.top);
+        let enemyMinimap = document.createElement('div');
+        enemyMinimap.classList.add('minimap-object', 'minimap-enemy');
+        enemyMinimap.style.width = '3px';
+        enemyMinimap.style.height = '3px';
+
+        // Calculate enemy position on minimap
+        let miniX = ex * scaleX;
+        let miniY = ey * scaleY;
+
+        // Ensure enemies just outside the screen are shown on the minimap within a secondary border
+        miniX = Math.max(0, Math.min(minimapWidth - 3, miniX)); // Clamp to minimap bounds
+        miniY = Math.max(0, Math.min(minimapHeight - 3, miniY)); // Clamp to minimap bounds
+
+        enemyMinimap.style.left = `${miniX}px`;
+        enemyMinimap.style.top = `${miniY}px`;
+        minimap.appendChild(enemyMinimap);
+    });
+}
+
+updateMinimap(); // Initial call to set the minimap size and content
 
 function updatePlayerAnimation() {
     frame++;
@@ -261,44 +344,8 @@ function moveEnemies() {
 
 }
 
-function updateMinimap() {
-    // Clear previous minimap objects
-    minimap.innerHTML = '';
 
-    // Add player position to minimap
-    let playerMinimap = document.createElement('div');
-    playerMinimap.classList.add('minimap-object');
-    playerMinimap.style.width = '5px';
-    playerMinimap.style.height = '5px';
-    playerMinimap.style.backgroundColor = 'red';
-    playerMinimap.style.left = `${(position.x / window.innerWidth) * minimap.offsetWidth}px`;
-    playerMinimap.style.top = `${(position.y / window.innerHeight) * minimap.offsetHeight}px`;
-    minimap.appendChild(playerMinimap);
 
-    // Add enemies to minimap
-    enemies.forEach(enemy => {
-        let ex = parseFloat(enemy.style.left);
-        let ey = parseFloat(enemy.style.top);
-        let enemyMinimap = document.createElement('div');
-        enemyMinimap.classList.add('minimap-object', 'minimap-enemy');
-        enemyMinimap.style.width = '3px';
-        enemyMinimap.style.height = '3px';
-
-        // Calculate position on minimap
-        let miniX = (ex / window.innerWidth) * minimap.offsetWidth;
-        let miniY = (ey / window.innerHeight) * minimap.offsetHeight;
-
-        // Ensure enemies just outside the screen are shown on the minimap within a secondary border
-        if (ex < 0) miniX = 0; // Left of screen, adjust to the edge of minimap
-        if (ex > window.innerWidth) miniX = minimap.offsetWidth - 3; // Right of screen, adjust to the edge of minimap
-        if (ey < 0) miniY = 0; // Top of screen, adjust to the edge of minimap
-        if (ey > window.innerHeight) miniY = minimap.offsetHeight - 3; // Bottom of screen, adjust to the edge of minimap
-
-        enemyMinimap.style.left = `${miniX}px`;
-        enemyMinimap.style.top = `${miniY}px`;
-        minimap.appendChild(enemyMinimap);
-    });
-}
 
 
 function shootBullet() {
@@ -379,7 +426,7 @@ function moveBullets() {
 
     // Update bullet speed and update UI only when an enemy is killed
     if (enemyKilled) {
-        console.log("die:" + enemiesKilled);
+        //console.log("die:" + enemiesKilled);
         if (bulletSpeed >= 100) {
             bulletSpeed -= 10;
         }
@@ -396,6 +443,7 @@ setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
 setInterval(moveEnemies, 100);
 setInterval(autoMovePlayer, 50);
 setInterval(updateMinimap, 100);
+setInterval(updatePlayerAnimation, 100);
 
 
 updatePosition();

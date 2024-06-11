@@ -48,7 +48,7 @@
         #bullet-speed, #health-bar-container, #enemy-kill-count, #countdown {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             font-size: 20px;
             color: black;
             background: rgba(255, 255, 255, 0.8);
@@ -95,18 +95,20 @@
             font-size: 16px;
             cursor: pointer;
         }
-        /* Minimap styles */
         #minimap {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             width: 150px;
             height: 150px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 1);
             border: 1px solid #ccc;
             border-radius: 5px;
             overflow: hidden;
+            transform-origin: top left;
         }
+
+
         .minimap-object {
             position: absolute;
             background-color: red;
@@ -115,16 +117,21 @@
         .minimap-enemy {
             background-color: green;
         }
-        #miniborder{
+        #zoom-controls {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 200px;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.5);
+            top: 170px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        #zoom-in, #zoom-out {
+            background: rgba(255, 255, 255, 0.8);
             border: 1px solid #ccc;
-            border-radius: 1px;
-            overflow: hidden;
+            border-radius: 5px;
+            font-size: 20px;
+            padding: 5px;
+            margin: 2px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -140,8 +147,12 @@
     <h1>You have died</h1>
     <button onclick="restartGame()">Restart</button>
 </div>
-
 <div id="minimap"></div>
+<div id="zoom-controls">
+    <row>
+    <button id="zoom-in">+</button>&nbsp;<button id="zoom-out">-</button>
+    </row>
+</div>
 
 <script src="xbox.js"></script>
 </body>
