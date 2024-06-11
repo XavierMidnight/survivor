@@ -24,6 +24,10 @@ const playerNumRows = 3; // Adjust the number of rows based on the sprite sheet
 const frameWidth = 45; // Adjust the width of each frame
 const frameHeight = 55; // Adjust the height of each frame
 let frame = 0; // Change this to display a different portion of the image
+let highScore = localStorage.getItem('highScore') || 0;
+const highScoreUI = document.getElementById('high-score');
+
+highScoreUI.innerText = `High Score: ${highScore}`;
 
 
 
@@ -53,8 +57,7 @@ function updateMinimapSize() {
     const minimapWidth = minimapHeight * windowAspect; // Adjust width based on aspect ratio
     minimap.style.width = `${minimapWidth * minimapScale}px`;
     minimap.style.height = `${minimapHeight * minimapScale}px`;
-    minimap.style.left += `${10}px`;
-    minimap.style.top += `${10}px`;
+
 
 }
 
@@ -129,6 +132,7 @@ function updateEnemyKillCountUI() {
     enemyKillCountUI.innerText = `Enemies Killed: ${enemiesKilled}`;
 }
 
+
 function decreaseHealth(amount) {
     healthPoints -= amount;
     if (healthPoints < 0) {
@@ -179,11 +183,19 @@ function endGame() {
     enemies = [];
     bullets = [];
 
+    // Check and update high score
+    if (enemiesKilled > highScore) {
+        highScore = enemiesKilled;
+        localStorage.setItem('highScore', highScore);
+        highScoreUI.innerText = `High Score: ${highScore}`;
+    }
+
     // Show game over screen
     gameOverScreen.style.display = 'block';
     // Start countdown for auto-restart
     startCountdown(5); // 5 seconds countdown
 }
+
 
 
 function restartGame() {
@@ -207,6 +219,7 @@ function restartGame() {
     enemyInterval = setInterval(spawnEnemy, 1000);
     autoMoveInterval = setInterval(autoMovePlayer, 1000);
 }
+
 
 
 function updatePosition() {
@@ -300,7 +313,7 @@ function spawnEnemy() {
 }
 
 function autoMovePlayer() {
-    if (Date.now() - lastMoveTime > 1000) {
+
         let nearestEnemies = findNearestEnemies(1); // Get the nearest enemy
         if (nearestEnemies.length > 0) {
             let nearestEnemy = nearestEnemies[0];
@@ -324,7 +337,7 @@ function autoMovePlayer() {
             updatePosition();
 
         }
-    }
+
 }
 
 function moveEnemies() {
@@ -446,7 +459,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
     setInterval(moveEnemies, 100);
     setInterval(updateMinimap, 100);
-    setInterval(updatePlayerAnimation, 100);
+    setInterval(updatePlayerAnimation, 150);
     updatePosition();
 });
 
