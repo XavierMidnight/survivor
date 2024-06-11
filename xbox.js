@@ -2,7 +2,7 @@ let cube = document.getElementById('cube');
 let enemies = [];
 let bullets = [];
 let position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-let enemyInterval, bulletInterval, autoMoveInterval, lastMoveTime = Date.now();
+let enemyInterval, bulletInterval, autoMoveInterval, lastMoveTime, moveEnemiesInterval,moveBulletsInterval = Date.now();
 const enemyImage = 'enemies.webp'; // Update with the correct path if needed
 const enemySize = { width: 64, height: 64 }; // Adjust the size if the new sprite sheet has different dimensions
 const numColumns = 5; // Adjust the number of columns based on the new sprite sheet
@@ -29,8 +29,25 @@ const highScoreUI = document.getElementById('high-score');
 
 highScoreUI.innerText = `High Score: ${highScore}`;
 
+document.getElementById('pause-button').addEventListener('click', pauseGame);
+document.getElementById('resume-button').addEventListener('click', resumeGame);
 
 
+function pauseGame() {
+    clearInterval(enemyInterval);
+    clearInterval(bulletInterval);
+    clearInterval(autoMoveInterval);
+    clearInterval(moveEnemiesInterval);
+    clearInterval(moveBulletsInterval);
+    document.getElementById('pause-button').style.display = 'none';
+    document.getElementById('resume-button').style.display = 'block';
+}
+
+function resumeGame() {
+    restartIntervals();
+    document.getElementById('pause-button').style.display = 'block';
+    document.getElementById('resume-button').style.display = 'none';
+}
 
 window.addEventListener('resize', () => {
     updateMinimapSize();
@@ -462,14 +479,16 @@ function moveBullets() {
 
 function restartIntervals() {
     bulletInterval = setInterval(shootBullet, bulletSpeed);
+    moveBulletsInterval = setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
     enemyInterval = setInterval(spawnEnemy, 1000);
     autoMoveInterval = setInterval(autoMovePlayer, 200);
+    moveEnemiesInterval = setInterval(moveEnemies, 100);
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
     restartIntervals();
-    setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
-    setInterval(moveEnemies, 100);
+
+
     setInterval(updateMinimap, 100);
     setInterval(updatePlayerAnimation, 150);
     updatePosition();

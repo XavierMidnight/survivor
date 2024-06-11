@@ -137,6 +137,10 @@
             color:black;
             background-color:white;
         }
+        #pause-button, #resume-button{
+            position: absolute;
+            left:550px;
+        }
     </style>
 </head>
 <body>
@@ -145,7 +149,11 @@
 <div id="health-bar-container">
     <div id="health-bar"></div>
 </div>
-<div id="high-score">High Score: 0</div>
+<div id="high-score">
+    High Score: 0
+</div>
+<button id="pause-button">Pause</button>
+<button id="resume-button" style="display: none;">Resume</button>
 
 <div id="countdown">Restarting in 5...</div>
 <div id="enemy-kill-count">Enemies Killed: 0</div>
