@@ -16,6 +16,7 @@ let isInvulnerable = false;
 const countdownElement = document.getElementById('countdown');
 let enemiesKilled = 0; // Track the number of enemies killed
 const enemyKillCountUI = document.getElementById('enemy-kill-count');
+const maxBulletDistance = 500; // Maximum distance a bullet can travel
 const minimap = document.getElementById('minimap');
 let minimapScale = 1; // Add a scale for zooming
 const playerAnimation = document.getElementById('cube');
@@ -388,7 +389,7 @@ function moveEnemies() {
 
 
 
-function shootBullet() {
+export function shootBullet() {
     if (enemies.length === 0) return;
     let nearestEnemy = findNearestEnemy();
     if (!nearestEnemy) return;
@@ -398,7 +399,7 @@ function shootBullet() {
     bullet.style.left = position.x + 20 + 'px';
     bullet.style.top = position.y + 20 + 'px';
     document.body.appendChild(bullet);
-    bullets.push({ element: bullet, target: nearestEnemy });
+    bullets.push({ element: bullet, target: nearestEnemy, startX: position.x, startY: position.y });
 }
 
 function findNearestEnemy() {
@@ -430,7 +431,7 @@ function createExplosion(x, y) {
     }, 500);
 }
 
-function moveBullets() {
+export function moveBullets() {
     let enemyKilled = false;
 
     bullets.forEach((bulletObj, index) => {
@@ -451,6 +452,16 @@ function moveBullets() {
         bullet.style.left = bx + Math.cos(angle) * 5 + 'px';
         bullet.style.top = by + Math.sin(angle) * 5 + 'px';
 
+        // Calculate the distance traveled by the bullet
+        let distanceTraveled = Math.sqrt((bx - bulletObj.startX) ** 2 + (by - bulletObj.startY) ** 2);
+
+        // Remove bullet if it exceeds the maximum distance
+        if (distanceTraveled > maxBulletDistance) {
+            bullet.remove();
+            bullets.splice(index, 1);
+            return;
+        }
+
         if (Math.abs(bx - tx) < 10 && Math.abs(by - ty) < 10) {
             createExplosion(tx, ty); // Show explosion effect
             target.remove();
@@ -466,7 +477,6 @@ function moveBullets() {
 
     // Update bullet speed and update UI only when an enemy is killed
     if (enemyKilled) {
-        //console.log("die:" + enemiesKilled);
         if (bulletSpeed >= 100) {
             bulletSpeed -= 10;
         }
