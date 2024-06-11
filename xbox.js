@@ -185,13 +185,14 @@ function endGame() {
     startCountdown(5); // 5 seconds countdown
 }
 
+
 function restartGame() {
     // Hide game over screen
     gameOverScreen.style.display = 'none';
 
     // Reset health and bullet speed
     healthPoints = 100;
-    bulletSpeed = 1000;
+    bulletSpeed = 1500;
     healthBar.style.width = `${healthPoints}%`;
     enemiesKilled = 0;
     updateBulletSpeedUI();
@@ -206,6 +207,7 @@ function restartGame() {
     enemyInterval = setInterval(spawnEnemy, 1000);
     autoMoveInterval = setInterval(autoMovePlayer, 1000);
 }
+
 
 function updatePosition() {
     cube.style.transform = `translate(${position.x}px, ${position.y}px)`;
@@ -437,13 +439,16 @@ function moveBullets() {
     }
 }
 
-enemyInterval = setInterval(spawnEnemy, 1000);
-bulletInterval = setInterval(shootBullet, bulletSpeed);
-setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
-setInterval(moveEnemies, 100);
-setInterval(autoMovePlayer, 50);
-setInterval(updateMinimap, 100);
-setInterval(updatePlayerAnimation, 100);
+document.addEventListener('DOMContentLoaded', (event) => {
+    bulletInterval = setInterval(shootBullet, bulletSpeed);
+    enemyInterval = setInterval(spawnEnemy, 1000);
+    autoMoveInterval = setInterval(autoMovePlayer, 1000);
+    setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
+    setInterval(moveEnemies, 100);
+    setInterval(updateMinimap, 100);
+    setInterval(updatePlayerAnimation, 100);
+    updatePosition();
+});
 
 
-updatePosition();
+
