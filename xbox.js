@@ -198,6 +198,7 @@ function endGame() {
 
 
 
+
 function restartGame() {
     // Hide game over screen
     gameOverScreen.style.display = 'none';
@@ -214,10 +215,14 @@ function restartGame() {
     position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     updatePosition();
 
+    // for some reason i need this
+    clearInterval(enemyInterval);
+
+
+
     // Restart intervals
-    bulletInterval = setInterval(shootBullet, bulletSpeed);
-    enemyInterval = setInterval(spawnEnemy, 1000);
-    autoMoveInterval = setInterval(autoMovePlayer, 1000);
+    restartIntervals();
+
 }
 
 
@@ -294,27 +299,30 @@ function spawnEnemy() {
     enemy.style.width = `${enemySize.width}px`;
     enemy.style.height = `${enemySize.height}px`;
 
-    let side = Math.floor(Math.random() * 4);
-    if (side === 0) {
-        enemy.style.left = Math.random() * window.innerWidth + 'px';
-        enemy.style.top = '-200px';
-    } else if (side === 1) {
-        enemy.style.left = Math.random() * window.innerWidth + 'px';
-        enemy.style.top = window.innerHeight + 'px';
-    } else if (side === 2) {
-        enemy.style.left = '-200px';
-        enemy.style.top = Math.random() * window.innerHeight + 'px';
-    } else {
-        enemy.style.left = window.innerWidth + 'px';
-        enemy.style.top = Math.random() * window.innerHeight + 'px';
-    }
+    // Calculate random angle and increased radius
+    let angle = Math.random() * 2 * Math.PI;
+    let radius = 500+Math.random()*500; // Increase the radius to make the circle diameter larger
+
+    // Calculate enemy position based on angle and increased radius
+    let enemyX = position.x + radius * Math.cos(angle);
+    let enemyY = position.y + radius * Math.sin(angle);
+
+    // Ensure the enemy is within the game bounds
+    enemyX = Math.max(0, Math.min(window.innerWidth - enemySize.width, enemyX));
+    enemyY = Math.max(0, Math.min(window.innerHeight - enemySize.height, enemyY));
+
+    enemy.style.left = `${enemyX}px`;
+    enemy.style.top = `${enemyY}px`;
+
     document.body.appendChild(enemy);
     enemies.push(enemy);
 }
 
+
+
 function autoMovePlayer() {
 
-        let nearestEnemies = findNearestEnemies(1); // Get the nearest enemy
+        let nearestEnemies = findNearestEnemies(3); // Get the nearest enemy
         if (nearestEnemies.length > 0) {
             let nearestEnemy = nearestEnemies[0];
 
@@ -323,8 +331,8 @@ function autoMovePlayer() {
             let ey = parseFloat(nearestEnemy.style.top);
             let angle = Math.atan2(position.y - ey, position.x - ex);
 
-            let moveX = Math.cos(angle) * 10; // Adjust speed as needed
-            let moveY = Math.sin(angle) * 10; // Adjust speed as needed
+            let moveX = Math.cos(angle) * 25; // Adjust speed as needed
+            let moveY = Math.sin(angle) * 25; // Adjust speed as needed
 
             // Move the player away from the nearest enemy
             position.x += moveX;
@@ -452,10 +460,14 @@ function moveBullets() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
+function restartIntervals() {
     bulletInterval = setInterval(shootBullet, bulletSpeed);
     enemyInterval = setInterval(spawnEnemy, 1000);
-    autoMoveInterval = setInterval(autoMovePlayer, 1000);
+    autoMoveInterval = setInterval(autoMovePlayer, 200);
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    restartIntervals();
     setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
     setInterval(moveEnemies, 100);
     setInterval(updateMinimap, 100);
