@@ -401,7 +401,8 @@ function moveEnemies() {
 
 export function shootBullet() {
     if (enemies.length === 0) return;
-    let nearestEnemy = findNearestEnemy();
+    //let nearestEnemy = findNearestEnemy();
+    let nearestEnemy = findNearestEnemyWithinBounds();
     if (!nearestEnemy) return;
 
     let bullet = document.createElement('div');
@@ -412,6 +413,31 @@ export function shootBullet() {
     bullets.push({ element: bullet, target: nearestEnemy, startX: position.x, startY: position.y });
     playShootingSound();
 }
+
+
+
+function findNearestEnemyWithinBounds() {
+    let bounds = { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight };
+    let minDistance = Infinity;
+    let nearestEnemy = null;
+
+    enemies.forEach(enemy => {
+        let ex = parseFloat(enemy.style.left);
+        let ey = parseFloat(enemy.style.top);
+
+        // Check if the enemy is within the bounds
+        if (ex >= bounds.left && ex <= bounds.right && ey >= bounds.top && ey <= bounds.bottom) {
+            let distance = Math.sqrt((position.x - ex) ** 2 + (position.y - ey) ** 2);
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestEnemy = enemy;
+            }
+        }
+    });
+
+    return nearestEnemy;
+}
+
 
 function findNearestEnemy() {
     let minDistance = Infinity;
