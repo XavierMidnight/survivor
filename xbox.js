@@ -2,7 +2,7 @@ let cube = document.getElementById('cube');
 let enemies = [];
 let bullets = [];
 let position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-let enemyInterval, bulletInterval, autoMoveInterval, lastMoveTime, moveEnemiesInterval,moveBulletsInterval = Date.now();
+let enemyInterval, bulletInterval, autoMoveInterval, lastMoveTime, moveEnemiesInterval,moveBulletsInterval;
 const enemyImage = 'images/enemies.webp'; // Update with the correct path if needed
 const enemySize = { width: 64, height: 64 }; // Adjust the size if the new sprite sheet has different dimensions
 const numColumns = 5; // Adjust the number of columns based on the new sprite sheet
@@ -27,6 +27,8 @@ const frameHeight = 55; // Adjust the height of each frame
 let frame = 0; // Change this to display a different portion of the image
 let highScore = localStorage.getItem('highScore') || 0;
 const highScoreUI = document.getElementById('high-score');
+import { playShootingSound, playExplosionSound } from './sounds.js';
+let gameEnded = false; // Flag to check if the game has already ended
 
 highScoreUI.innerText = `High Score: ${highScore}`;
 
@@ -152,6 +154,8 @@ function updateEnemyKillCountUI() {
 
 
 function decreaseHealth(amount) {
+if(healthPoints<=0) return;
+
     healthPoints -= amount;
     if (healthPoints < 0) {
         healthPoints = 0;
@@ -159,6 +163,7 @@ function decreaseHealth(amount) {
     healthBar.style.width = `${healthPoints}%`;
 
     if (healthPoints <= 0) {
+        console.log('calling end game');
         endGame();
     } else {
         // Make player invulnerable and apply red filter
@@ -174,6 +179,7 @@ function decreaseHealth(amount) {
 }
 
 function startCountdown(seconds) {
+    console.log('startCountdown');
     let remainingTime = seconds;
     countdownElement.innerText = `Restarting in ${remainingTime}...`;
     countdownElement.style.display = 'block';
@@ -185,15 +191,24 @@ function startCountdown(seconds) {
         if (remainingTime <= 0) {
             clearInterval(countdownInterval);
             countdownElement.style.display = 'none';
+            console.log('remaining loop');
             restartGame();
         }
     }, 1000);
 }
 
 function endGame() {
+    if (gameEnded) {
+        return; // Prevent endGame from running multiple times
+    }
+
+    gameEnded = true; // Set the flag to indicate the game has ended
+
     clearInterval(enemyInterval);
     clearInterval(bulletInterval);
     clearInterval(autoMoveInterval);
+    clearInterval(moveEnemiesInterval);
+    clearInterval(moveBulletsInterval);
 
     // Remove all enemies and bullets
     enemies.forEach(enemy => enemy.remove());
@@ -216,8 +231,10 @@ function endGame() {
 
 
 
-
+let restartCount = 0;
 function restartGame() {
+restartCount++;
+    console.log('restartCount'+restartCount)
     // Hide game over screen
     gameOverScreen.style.display = 'none';
 
@@ -231,23 +248,16 @@ function restartGame() {
 
     // Reset player position
     position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    updatePosition();
-
-    // for some reason i need this
-    clearInterval(enemyInterval);
-
-
 
     // Restart intervals
     restartIntervals();
-
+    gameEnded = false; // Set the flag to indicate the game has restarted
 }
 
 
 
 function updatePosition() {
     cube.style.transform = `translate(${position.x}px, ${position.y}px)`;
-
 }
 
 window.addEventListener("gamepadconnected", (event) => {
@@ -400,6 +410,7 @@ export function shootBullet() {
     bullet.style.top = position.y + 20 + 'px';
     document.body.appendChild(bullet);
     bullets.push({ element: bullet, target: nearestEnemy, startX: position.x, startY: position.y });
+    playShootingSound();
 }
 
 function findNearestEnemy() {
@@ -424,7 +435,7 @@ function createExplosion(x, y) {
     explosion.style.left = `${x}px`;
     explosion.style.top = `${y}px`;
     document.body.appendChild(explosion);
-
+    playExplosionSound();
     // Remove the explosion effect after a short duration
     setTimeout(() => {
         explosion.remove();
@@ -488,16 +499,18 @@ export function moveBullets() {
 }
 
 function restartIntervals() {
+    console.log('restart intervals');
     bulletInterval = setInterval(shootBullet, bulletSpeed);
     moveBulletsInterval = setInterval(moveBullets, bulletSpeed / bulletSpeed * 10);
-    enemyInterval = setInterval(spawnEnemy, 1000);
+    enemyInterval = setInterval(spawnEnemy, 1000 - enemiesKilled );
     autoMoveInterval = setInterval(autoMovePlayer, 200);
     moveEnemiesInterval = setInterval(moveEnemies, 100);
+
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
+    console.log('dom loaded');
     restartIntervals();
-
 
     setInterval(updateMinimap, 100);
     setInterval(updatePlayerAnimation, 150);
